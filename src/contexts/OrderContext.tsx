@@ -8,6 +8,7 @@ export interface MealItem {
   price: number;
   image: string;
   description: string;
+  category?: string;
 }
 
 // Define order context type
@@ -38,28 +39,167 @@ const OrderContext = createContext<OrderContextType | undefined>(undefined);
 
 // Provider component
 export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  // Initial meals data
+  // Initial meals data with expanded menu
   const [meals] = useState<MealItem[]>([
     {
       id: "meal1",
-      name: "Energy-Boosting Chicken Rice",
-      price: 5.00,
-      image: "/meals/meal1.jpg",
-      description: "A nutritious meal for recovery and energy."
+      name: "Hainanese Chicken Rice",
+      price: 6.50,
+      image: "/meals/hainanese-chicken-rice.jpg",
+      description: "Fragrant rice with tender poached chicken and flavorful sauces.",
+      category: "Signature Dishes"
     },
     {
       id: "meal2",
-      name: "Chicken Rice (Black Pepper)",
-      price: 6.50,
-      image: "/meals/meal2.jpg",
-      description: "Savory black pepper chicken rice for enhanced flavor."
+      name: "Chili Crab",
+      price: 10.00,
+      image: "/meals/chili-crab.jpg",
+      description: "Singapore's iconic dish of crab in sweet and spicy tomato sauce.",
+      category: "Seafood"
     },
     {
       id: "meal3",
-      name: "60s Chicken Rice",
+      name: "Laksa",
+      price: 7.50,
+      image: "/meals/laksa.jpg",
+      description: "Spicy coconut milk-based noodle soup with prawns and fish cake.",
+      category: "Noodles"
+    },
+    {
+      id: "meal4",
+      name: "Char Kway Teow",
+      price: 6.50,
+      image: "/meals/char-kway-teow.jpg",
+      description: "Stir-fried flat rice noodles with prawns, lap cheong, and bean sprouts.",
+      category: "Noodles"
+    },
+    {
+      id: "meal5",
+      name: "Hokkien Mee",
       price: 7.00,
-      image: "/meals/meal3.jpg",
-      description: "Classic recipe with a nostalgic touch."
+      image: "/meals/hokkien-mee.jpg",
+      description: "Braised egg noodles and rice noodles in a rich prawn and pork stock.",
+      category: "Noodles"
+    },
+    {
+      id: "meal6",
+      name: "Satay",
+      price: 7.50,
+      image: "/meals/satay.jpg",
+      description: "Grilled skewers of marinated meat served with peanut sauce.",
+      category: "Appetizers"
+    },
+    {
+      id: "meal7",
+      name: "Bak Chor Mee",
+      price: 6.50,
+      image: "/meals/bak-chor-mee.jpg",
+      description: "Minced pork noodles with liver, meatballs, and vinegar.",
+      category: "Noodles"
+    },
+    {
+      id: "meal8",
+      name: "Fish Head Curry",
+      price: 9.50,
+      image: "/meals/fish-head-curry.jpg",
+      description: "Red snapper head in a spicy tamarind and coconut curry.",
+      category: "Seafood"
+    },
+    {
+      id: "meal9",
+      name: "Nasi Lemak",
+      price: 7.00,
+      image: "/meals/nasi-lemak.jpg",
+      description: "Coconut rice with sambal, fried fish, eggs, peanuts, and cucumber.",
+      category: "Rice Dishes"
+    },
+    {
+      id: "meal10",
+      name: "Roti Prata",
+      price: 6.50,
+      image: "/meals/roti-prata.jpg",
+      description: "Flaky flatbread served with curry dipping sauce.",
+      category: "Appetizers"
+    },
+    {
+      id: "meal11",
+      name: "Bak Kut Teh",
+      price: 8.00,
+      image: "/meals/bak-kut-teh.jpg",
+      description: "Pork ribs soup with herbs and spices, served with rice.",
+      category: "Soup & Stew"
+    },
+    {
+      id: "meal12",
+      name: "Yong Tau Foo",
+      price: 7.50,
+      image: "/meals/yong-tau-foo.jpg",
+      description: "Stuffed tofu and vegetables in clear soup or with laksa gravy.",
+      category: "Soup & Stew"
+    },
+    {
+      id: "meal13",
+      name: "Wanton Mee",
+      price: 6.50,
+      image: "/meals/wanton-mee.jpg",
+      description: "Noodles with char siu and dumplings, in soup or with sauce.",
+      category: "Noodles"
+    },
+    {
+      id: "meal14",
+      name: "Beef Rendang",
+      price: 8.50,
+      image: "/meals/beef-rendang.jpg",
+      description: "Slow-cooked beef in rich coconut and spice gravy.",
+      category: "Meat Dishes"
+    },
+    {
+      id: "meal15",
+      name: "Oyster Omelette",
+      price: 7.00,
+      image: "/meals/oyster-omelette.jpg",
+      description: "Crispy egg omelette with fresh oysters and tangy chili sauce.",
+      category: "Seafood"
+    },
+    {
+      id: "meal16",
+      name: "Claypot Rice",
+      price: 7.50,
+      image: "/meals/claypot-rice.jpg",
+      description: "Rice cooked in claypot with chinese sausage, chicken, and vegetables.",
+      category: "Rice Dishes"
+    },
+    {
+      id: "meal17",
+      name: "Sambal Stingray",
+      price: 9.00,
+      image: "/meals/sambal-stingray.jpg",
+      description: "Grilled stingray topped with spicy sambal and lime.",
+      category: "Seafood"
+    },
+    {
+      id: "meal18",
+      name: "Fried Carrot Cake",
+      price: 6.50,
+      image: "/meals/fried-carrot-cake.jpg",
+      description: "Stir-fried radish cake with eggs and preserved radish.",
+      category: "Appetizers"
+    },
+    {
+      id: "meal19",
+      name: "Mee Siam",
+      price: 6.50,
+      image: "/meals/mee-siam.jpg",
+      description: "Thin rice vermicelli in spicy, sweet and sour gravy.",
+      category: "Noodles"
+    },
+    {
+      id: "meal20",
+      name: "Curry Chicken Bee Hoon",
+      price: 7.50,
+      image: "/meals/curry-chicken-bee-hoon.jpg",
+      description: "Rice vermicelli in a rich coconut chicken curry.",
+      category: "Noodles"
     },
   ]);
 

@@ -1,0 +1,18 @@
+
+<svg width="400" height="300" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M130 110C130 110 120 120 140 130C160 140 180 130 180 130" stroke="black" stroke-width="3"/>
+  <path d="M150 130C150 130 149 135 152 140C155 145 160 148 160 148" stroke="black" stroke-width="3"/>
+  <path d="M70 213L95 160L120 213M95 200L117 200" fill="none" stroke="#C3272B" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M135 160L145 185L165 155L185 213" fill="none" stroke="#37A949" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M195 160H270" stroke="#37A949" stroke-width="10" stroke-linecap="round"/>
+  <path d="M195 188H245" stroke="#37A949" stroke-width="10" stroke-linecap="round"/>
+  <path d="M195 213H270" stroke="#37A949" stroke-width="10" stroke-linecap="round"/>
+  <path d="M280 160H355" stroke="#37A949" stroke-width="10" stroke-linecap="round"/>
+  <path d="M280 188H330" stroke="#37A949" stroke-width="10" stroke-linecap="round"/>
+  <path d="M280 213H355" stroke="#37A949" stroke-width="10" stroke-linecap="round"/>
+  <path d="M130 80L280 80C280 80 310 80 340 110" stroke="#C3272B" stroke-width="10" stroke-linecap="round"/>
+  <path d="M260 255L262.5 255.5C271.833 255.5 290.5 255.5 290.5 255.5C290.5 255.5 292.5 255.5 294 255C295.5 254.5 296 253.5 296 253.5" stroke="#333333" stroke-width="1"/>
+  <text x="260" y="270" font-family="Arial" font-size="15" fill="#333333">HEALTHY AND TASTY</text>
+  <path d="M127 90L350 90" stroke="#C3272B" stroke-width="5" stroke-linecap="round"/>
+  <path d="M125 65L340 40" stroke="#C3272B" stroke-width="5" stroke-linecap="round"/>
+</svg>
