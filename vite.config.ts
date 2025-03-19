@@ -19,4 +19,15 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    outDir: 'dist',
+    rollupOptions: {
+      external: [
+        // Add externals if needed in the future
+      ],
+    },
+    commonjsOptions: {
+      include: [/node_modules/],
+    },
+  },
 }));
