@@ -5,14 +5,34 @@ import OrderSummary from '@/components/OrderSummary';
 import { Button } from '@/components/ui/button';
 import { useOrder } from '@/contexts/OrderContext';
 import { formatDateForDisplay } from '@/lib/constants';
+import { Calendar } from 'lucide-react';
 
 const Checkout = () => {
-  const { cartItems, date, hospital } = useOrder();
+  const { meals, cartItems, itemDates, date, hospital } = useOrder();
   const navigate = useNavigate();
   
   // Count total items in cart
   const cartItemCount = Object.values(cartItems).reduce((total, qty) => total + qty, 0);
   const isCartEmpty = cartItemCount === 0;
+
+  // Get unique delivery dates
+  const cartItemsWithDates = meals
+    .filter(meal => (cartItems[meal.id.toString()] || 0) > 0)
+    .map(meal => ({
+      ...meal,
+      quantity: cartItems[meal.id.toString()],
+      itemDate: itemDates[meal.id.toString()] || date
+    }));
+
+  // Group items by date
+  const itemsByDate = cartItemsWithDates.reduce((acc, item) => {
+    const dateKey = item.itemDate;
+    if (!acc[dateKey]) {
+      acc[dateKey] = [];
+    }
+    acc[dateKey].push(item);
+    return acc;
+  }, {} as Record<string, typeof cartItemsWithDates>);
   
   const goToCart = () => {
     navigate('/cart');
@@ -52,14 +72,38 @@ const Checkout = () => {
                   </Button>
                 </div>
                 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4">
                   <div>
-                    <h3 className="text-sm text-gray-500 mb-1">Delivery Date</h3>
-                    <p className="font-medium">{formatDateForDisplay(date)}</p>
-                  </div>
-                  <div>
-                    <h3 className="text-sm text-gray-500 mb-1">Delivery Location</h3>
+                    <h3 className="text-sm text-gray-500 mb-2">Delivery Location</h3>
                     <p className="font-medium">{hospital}</p>
+                  </div>
+                  
+                  <div>
+                    <h3 className="text-sm text-gray-500 mb-2">Delivery Schedule</h3>
+                    {Object.keys(itemsByDate).length > 1 ? (
+                      <div className="space-y-3">
+                        {Object.entries(itemsByDate).map(([dateKey, items]) => (
+                          <div key={dateKey} className="p-3 border rounded-lg bg-gray-50">
+                            <div className="flex items-center">
+                              <Calendar size={16} className="text-primary mr-2" />
+                              <span className="font-medium">{formatDateForDisplay(dateKey)}</span>
+                            </div>
+                            <div className="mt-2 pl-6">
+                              <ul className="text-sm space-y-1">
+                                {items.map((item, index) => (
+                                  <li key={index} className="flex justify-between">
+                                    <span>{item.name}</span>
+                                    <span className="text-gray-500">x{item.quantity}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="font-medium">{formatDateForDisplay(date)}</p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -85,17 +129,11 @@ const Checkout = () => {
             </div>
             
             <div>
-              <div className="bg-white rounded-2xl shadow-elegant p-6 border border-gray-100">
-                <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
-                <OrderSummary />
-                <div className="mt-6 pt-6 border-t">
-                  <Button className="w-full" size="lg" onClick={placeOrder}>
-                    Place Order
-                  </Button>
-                  <p className="text-xs text-center text-gray-500 mt-4">
-                    By placing your order, you agree to our Terms of Service and Privacy Policy.
-                  </p>
-                </div>
+              <OrderSummary />
+              <div className="bg-white rounded-2xl shadow-elegant p-6 border border-gray-100 mt-6">
+                <p className="text-xs text-center text-gray-500">
+                  By placing your order, you agree to our Terms of Service and Privacy Policy.
+                </p>
               </div>
             </div>
           </div>

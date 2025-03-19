@@ -14,10 +14,17 @@ export interface MealItem {
   isNew?: boolean;
 }
 
+// Define cart item with date
+export interface CartItemWithDate {
+  quantity: number;
+  date: string;
+}
+
 // Define order context type
 interface OrderContextType {
   meals: MealItem[];
   cartItems: Record<string, number>;
+  itemDates: Record<string, string>;
   date: string;
   hospital: string;
   referralCode: string;
@@ -26,6 +33,7 @@ interface OrderContextType {
   loyaltyPoints: number;
   updateCartItem: (id: string, quantity: number) => void;
   updateDate: (date: string) => void;
+  updateItemDate: (id: string, date: string) => void;
   updateHospital: (hospital: string) => void;
   updateReferralCode: (code: string) => void;
   clearCart: () => void;
@@ -215,6 +223,7 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   // State for order details
   const [cartItems, setCartItems] = useState<Record<string, number>>({});
+  const [itemDates, setItemDates] = useState<Record<string, string>>({});
   const [date, setDate] = useState<string>(DEFAULT_DATE);
   const [hospital, setHospital] = useState<string>(DEFAULT_HOSPITAL);
   const [referralCode, setReferralCode] = useState<string>("");
@@ -261,7 +270,7 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     setSubtotal(finalTotal);
   }, [cartItems, referralCode, meals]);
 
-  // Save current cart items when they change
+  // Keep track of items in session storage
   useEffect(() => {
     if (date && Object.keys(cartItems).length > 0) {
       setOrdersByDate(prev => ({
@@ -271,29 +280,47 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     }
   }, [cartItems, date]);
 
-  // Add/update item in cart
+  // Update a cart item
   const updateCartItem = (id: string, quantity: number) => {
     setCartItems(prev => ({
       ...prev,
       [id]: quantity
     }));
-  };
-
-  // Update date
-  const updateDate = (newDate: string) => {
-    // Save current cart items before changing date
-    if (date && Object.keys(cartItems).length > 0) {
-      setOrdersByDate(prev => ({
+    
+    // Initialize the item date if it doesn't exist yet
+    if (quantity > 0 && !itemDates[id]) {
+      setItemDates(prev => ({
         ...prev,
-        [date]: { ...cartItems }
+        [id]: date
       }));
     }
+  };
 
-    // Set the new date
+  // Update the global date
+  const updateDate = (newDate: string) => {
     setDate(newDate);
     
-    // Load cart items for the new date or reset cart if no previous orders exist
-    setCartItems(ordersByDate[newDate] || {});
+    // Update all item dates that haven't been individually set
+    setItemDates(prev => {
+      const updatedDates = { ...prev };
+      
+      // For each item in the cart
+      Object.keys(cartItems).forEach(itemId => {
+        if (cartItems[itemId] > 0) {
+          updatedDates[itemId] = newDate;
+        }
+      });
+      
+      return updatedDates;
+    });
+  };
+  
+  // Update date for a specific item
+  const updateItemDate = (id: string, newDate: string) => {
+    setItemDates(prev => ({
+      ...prev,
+      [id]: newDate
+    }));
   };
 
   // Update hospital
@@ -309,30 +336,34 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   // Clear cart
   const clearCart = () => {
     setCartItems({});
+    setItemDates({});
   };
 
   // Place order
   const placeOrder = () => {
-    // Add loyalty points (1 point per $1 spent)
-    const newPoints = Math.floor(subtotal) + loyaltyPoints;
-    setLoyaltyPoints(newPoints);
+    // Simulate order placement
+    console.log("Order placed:", {
+      items: cartItems,
+      itemDates,
+      hospital,
+      totalAmount: subtotal,
+      discount: savedAmount,
+      finalAmount: subtotal - savedAmount
+    });
     
-    // Store the order for this date
-    if (date) {
-      setOrdersByDate(prev => ({
-        ...prev,
-        [date]: { ...cartItems }
-      }));
-    }
+    // Add loyalty points (10 points per dollar spent)
+    const points = Math.round((subtotal - savedAmount) * 10);
+    setLoyaltyPoints(prev => prev + points);
     
     // Clear cart after order
     clearCart();
   };
 
-  // Context value
+  // Provide context value
   const value: OrderContextType = {
     meals,
     cartItems,
+    itemDates,
     date,
     hospital,
     referralCode,
@@ -341,6 +372,7 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     loyaltyPoints,
     updateCartItem,
     updateDate,
+    updateItemDate,
     updateHospital,
     updateReferralCode,
     clearCart,
@@ -350,11 +382,11 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   return <OrderContext.Provider value={value}>{children}</OrderContext.Provider>;
 };
 
-// Custom hook for using the order context
+// Hook to use the order context
 export const useOrder = () => {
   const context = useContext(OrderContext);
   if (context === undefined) {
-    throw new Error('useOrder must be used within an OrderProvider');
+    throw new Error("useOrder must be used within an OrderProvider");
   }
   return context;
 };

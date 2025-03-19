@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dialog";
 
 const Cart = () => {
-  const { meals, cartItems, updateCartItem, date, updateDate, hospital } = useOrder();
+  const { meals, cartItems, itemDates, updateCartItem, date, updateDate, updateItemDate, hospital } = useOrder();
   const navigate = useNavigate();
   const [isDateSelectorOpen, setIsDateSelectorOpen] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
@@ -27,7 +27,8 @@ const Cart = () => {
     .map(meal => ({
       ...meal,
       quantity: cartItems[meal.id.toString()],
-      stringId: meal.id.toString()
+      stringId: meal.id.toString(),
+      itemDate: itemDates[meal.id.toString()] || date
     }));
   
   const isCartEmpty = cartItemsWithDetails.length === 0;
@@ -57,11 +58,13 @@ const Cart = () => {
   
   const handleDateSelected = (newDate: string) => {
     if (selectedItemId) {
-      // Logic to change the date for this specific item would go here
-      // For now, we'll just update the global date
+      // Update only the selected item's date
+      updateItemDate(selectedItemId, newDate);
+    } else {
+      // Update the global date (affects all items without custom dates)
       updateDate(newDate);
-      setIsDateSelectorOpen(false);
     }
+    setIsDateSelectorOpen(false);
   };
   
   const continueShopping = () => {
@@ -90,40 +93,33 @@ const Cart = () => {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
-              {/* Delivery Details */}
-              <div className="bg-white rounded-2xl shadow-elegant p-6 border border-gray-100 mb-6">
-                <div className="flex justify-between items-center">
-                  <h2 className="text-lg font-semibold mb-4">Delivery Details</h2>
+              {/* Order Details */}
+              <div className="bg-white rounded-2xl shadow-elegant p-6 border border-gray-100">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-xl font-semibold">Your Order Summary</h2>
                   <Dialog open={isDateSelectorOpen} onOpenChange={setIsDateSelectorOpen}>
                     <DialogTrigger asChild>
-                      <Button variant="outline" size="sm" className="flex items-center mb-4">
+                      <Button variant="outline" className="flex items-center">
                         <Calendar className="mr-2 h-4 w-4" />
-                        <span>Change Date</span>
+                        <span>Change All Dates</span>
                       </Button>
                     </DialogTrigger>
                     <DialogContent>
                       <DialogHeader>
-                        <DialogTitle>Select New Delivery Date</DialogTitle>
+                        <DialogTitle>
+                          {selectedItemId 
+                            ? "Select Delivery Date for This Item" 
+                            : "Select New Delivery Date for All Items"
+                          }
+                        </DialogTitle>
                       </DialogHeader>
-                      <DateSelector onDateSelected={handleDateSelected} initialDate={date} />
+                      <DateSelector 
+                        onDateSelected={handleDateSelected} 
+                        initialDate={selectedItemId ? itemDates[selectedItemId] || date : date} 
+                      />
                     </DialogContent>
                   </Dialog>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <span className="text-sm text-gray-500">Date</span>
-                    <p className="font-medium">{formatDateForDisplay(date)}</p>
-                  </div>
-                  <div>
-                    <span className="text-sm text-gray-500">Hospital</span>
-                    <p className="font-medium">{hospital}</p>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Cart Items */}
-              <div className="bg-white rounded-2xl shadow-elegant p-6 border border-gray-100">
-                <h2 className="text-lg font-semibold mb-4">Cart Items</h2>
                 
                 <div className="border rounded-lg overflow-hidden mb-6">
                   <table className="w-full">
@@ -132,6 +128,7 @@ const Cart = () => {
                         <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Item</th>
                         <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Quantity</th>
                         <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Price</th>
+                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Delivery Date</th>
                         <th className="px-4 py-3 text-center text-sm font-medium text-gray-500">Actions</th>
                       </tr>
                     </thead>
@@ -175,6 +172,19 @@ const Cart = () => {
                           <td className="px-4 py-4">
                             ${(item.price * item.quantity).toFixed(2)}
                           </td>
+                          <td className="px-4 py-4">
+                            <div className="flex items-center">
+                              <span className="mr-2">{formatDateForDisplay(item.itemDate)}</span>
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-6 w-6 text-gray-400 hover:text-primary"
+                                onClick={() => handleChangeDateClick(item.stringId)}
+                              >
+                                <Edit2 size={14} />
+                              </Button>
+                            </div>
+                          </td>
                           <td className="px-4 py-4 text-center">
                             <Button
                               variant="ghost"
@@ -191,20 +201,32 @@ const Cart = () => {
                   </table>
                 </div>
                 
-                <div className="mt-6 pt-4 border-t flex justify-between items-center">
-                  <Button variant="outline" onClick={continueShopping}>
-                    Continue Shopping
-                  </Button>
+                <div className="border-t pt-6 mt-6">
+                  <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
+                    <Button variant="outline" onClick={continueShopping}>
+                      Add More Items
+                    </Button>
+                    <div className="flex items-center space-x-4">
+                      <div className="text-right">
+                        <div className="text-sm text-gray-500 mb-1">Total</div>
+                        <div className="text-2xl font-bold">
+                          ${cartItemsWithDetails.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2)}
+                        </div>
+                      </div>
+                      <Button onClick={proceedToCheckout}>
+                        Proceed to Checkout
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
             
             <div>
               <OrderSummary />
-              <div className="mt-4">
-                <Button className="w-full" onClick={proceedToCheckout}>
-                  Proceed to Checkout
-                </Button>
+              <div className="bg-white rounded-2xl shadow-elegant p-6 border border-gray-100 mt-6">
+                <h3 className="text-md font-semibold mb-2">Delivery To</h3>
+                <p className="text-gray-600">{hospital}</p>
               </div>
             </div>
           </div>

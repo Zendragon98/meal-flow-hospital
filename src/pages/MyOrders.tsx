@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dialog";
 
 const MyOrders = () => {
-  const { meals, cartItems, updateCartItem, date, updateDate } = useOrder();
+  const { meals, cartItems, itemDates, updateCartItem, date, updateDate, updateItemDate } = useOrder();
   const navigate = useNavigate();
   const [isDateSelectorOpen, setIsDateSelectorOpen] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
@@ -26,7 +26,8 @@ const MyOrders = () => {
     .map(meal => ({
       ...meal,
       quantity: cartItems[meal.id.toString()],
-      stringId: meal.id.toString()
+      stringId: meal.id.toString(),
+      itemDate: itemDates[meal.id.toString()] || date
     }));
   
   const isCartEmpty = cartItemsWithDetails.length === 0;
@@ -56,11 +57,13 @@ const MyOrders = () => {
   
   const handleDateSelected = (newDate: string) => {
     if (selectedItemId) {
-      // Logic to change the date for this specific item would go here
-      // For now, we'll just update the global date
+      // Update only the selected item's date
+      updateItemDate(selectedItemId, newDate);
+    } else {
+      // Update the global date (affects all items without custom dates)
       updateDate(newDate);
-      setIsDateSelectorOpen(false);
     }
+    setIsDateSelectorOpen(false);
   };
   
   const continueShopping = () => {
@@ -101,9 +104,17 @@ const MyOrders = () => {
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>Select New Delivery Date</DialogTitle>
+                      <DialogTitle>
+                        {selectedItemId 
+                          ? "Select Delivery Date for This Item" 
+                          : "Select New Delivery Date for All Items"
+                        }
+                      </DialogTitle>
                     </DialogHeader>
-                    <DateSelector onDateSelected={handleDateSelected} initialDate={date} />
+                    <DateSelector 
+                      onDateSelected={handleDateSelected} 
+                      initialDate={selectedItemId ? itemDates[selectedItemId] || date : date} 
+                    />
                   </DialogContent>
                 </Dialog>
               </div>
@@ -161,7 +172,7 @@ const MyOrders = () => {
                         </td>
                         <td className="px-4 py-4">
                           <div className="flex items-center">
-                            <span className="mr-2">{formatDateForDisplay(date)}</span>
+                            <span className="mr-2">{formatDateForDisplay(item.itemDate)}</span>
                             <Button 
                               variant="ghost" 
                               size="icon" 
