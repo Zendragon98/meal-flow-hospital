@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Plus, Minus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -11,7 +10,8 @@ interface MealCardProps {
 
 const MealCard: React.FC<MealCardProps> = ({ meal }) => {
   const { cartItems, updateCartItem } = useOrder();
-  const quantity = cartItems[meal.id] || 0;
+  const mealId = meal.id.toString(); // Convert ID to string
+  const quantity = cartItems[mealId] || 0;
   const [inputValue, setInputValue] = useState(quantity.toString());
 
   // Update input value when quantity changes (from date change or other components)
@@ -21,14 +21,14 @@ const MealCard: React.FC<MealCardProps> = ({ meal }) => {
 
   const handleIncrement = () => {
     const newQuantity = quantity + 1;
-    updateCartItem(meal.id, newQuantity);
+    updateCartItem(mealId, newQuantity);
     setInputValue(newQuantity.toString());
   };
 
   const handleDecrement = () => {
     if (quantity > 0) {
       const newQuantity = quantity - 1;
-      updateCartItem(meal.id, newQuantity);
+      updateCartItem(mealId, newQuantity);
       setInputValue(newQuantity.toString());
     }
   };
@@ -40,7 +40,7 @@ const MealCard: React.FC<MealCardProps> = ({ meal }) => {
     // Only update context if the value is a valid number
     const numValue = parseInt(value, 10);
     if (!isNaN(numValue) && numValue >= 0) {
-      updateCartItem(meal.id, numValue);
+      updateCartItem(mealId, numValue);
     }
   };
 
@@ -49,7 +49,14 @@ const MealCard: React.FC<MealCardProps> = ({ meal }) => {
     const numValue = parseInt(inputValue, 10);
     if (isNaN(numValue) || numValue < 0) {
       setInputValue('0');
-      updateCartItem(meal.id, 0);
+      updateCartItem(mealId, 0);
+    }
+  };
+  
+  const handleAddToOrder = () => {
+    if (quantity === 0) {
+      updateCartItem(mealId, 1);
+      setInputValue('1');
     }
   };
 
@@ -102,6 +109,15 @@ const MealCard: React.FC<MealCardProps> = ({ meal }) => {
             </Button>
           </div>
         </div>
+
+        <Button 
+          variant="default"
+          className="w-full mt-4 bg-primary text-white hover:bg-primary/90"
+          onClick={handleAddToOrder}
+          disabled={quantity > 0}
+        >
+          {quantity > 0 ? 'Added to Order' : 'Add to Order'}
+        </Button>
       </div>
     </div>
   );
