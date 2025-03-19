@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Toaster } from '@/components/ui/toaster';
 import DateSelector from '@/components/DateSelector';
@@ -29,12 +28,21 @@ const Index = () => {
       
       <main className="flex-1 container mx-auto px-4 py-8 md:py-12">
         <div className="space-y-6 animate-fade-in">
-          {/* Welcome Section */}
-          <section className="text-center max-w-2xl mx-auto mb-8">
-            <h1 className="text-4xl font-bold tracking-tight mb-4">Hospital Meal Delivery</h1>
-            <p className="text-gray-600">
-              Authentic Singaporean cuisine delivered directly to your hospital.
-            </p>
+          {/* Welcome Section with Background */}
+          <section 
+            className="relative text-center py-16 px-6 rounded-2xl overflow-hidden mb-8"
+            style={{
+              backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(/hospital-food-bg.jpg)',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            }}
+          >
+            <div className="relative z-10 max-w-2xl mx-auto">
+              <h1 className="text-4xl font-bold tracking-tight mb-4 text-white">Hospital Meal Delivery</h1>
+              <p className="text-gray-200">
+                Authentic Singaporean cuisine delivered directly to your hospital.
+              </p>
+            </div>
           </section>
           
           {/* Delivery Details */}

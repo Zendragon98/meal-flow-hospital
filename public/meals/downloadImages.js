@@ -1,11 +1,14 @@
-
 // This is a helper script to download the meal images
 // You would run this script separately to download all the images
 // For a real project, you would upload actual images to the public/meals directory
 
-const fs = require('fs');
-const https = require('https');
-const path = require('path');
+import fs from 'fs';
+import https from 'https';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const imageUrls = {
   'hainanese-chicken-rice.jpg': 'https://images.unsplash.com/photo-1569058242253-92a9c755a0ec',
