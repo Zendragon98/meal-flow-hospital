@@ -47,6 +47,9 @@ const Index = () => {
               <div className="inline-block bg-brand-100 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 px-4 py-1 rounded-full text-sm font-medium mb-2">
                 For Healthcare Professionals
               </div>
+              <div className="mb-4">
+                <img src="/KCKLogo.svg" alt="KCK Logo" className="h-16 w-auto" />
+              </div>
               <h1 className="text-4xl sm:text-5xl font-bold leading-tight">
                 Delicious Meals Delivered to Your Hospital
               </h1>
@@ -212,7 +215,7 @@ const Index = () => {
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold mb-4">What Our Customers Say</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Hear from healthcare professionals who rely on Midnight Mealmate during their shifts.
+            Hear from healthcare professionals who rely on KCK for their shifts.
           </p>
         </div>
         
@@ -221,7 +224,7 @@ const Index = () => {
             {
               name: "Dr. Sarah Tan",
               role: "Emergency Physician",
-              text: "Midnight Mealmate has been a lifesaver during my overnight shifts. The food is delicious and delivered right to the hospital."
+              text: "KCK has been a lifesaver during my overnight shifts. The food is delicious and delivered right to the hospital."
             },
             {
               name: "Nurse Ahmad",
@@ -257,9 +260,9 @@ const Index = () => {
       {/* CTA Section */}
       <section className="py-20 bg-brand-500 text-white">
         <div className="container text-center">
-          <h2 className="text-3xl font-bold mb-4">Ready to simplify your meal planning?</h2>
+          <h2 className="text-3xl font-bold mb-4">Ready to Order?</h2>
           <p className="max-w-2xl mx-auto mb-8 text-white/80">
-            Join hundreds of healthcare professionals who trust Midnight Mealmate for their hospital meal deliveries.
+            Join hundreds of healthcare professionals who trust KCK for their hospital meal deliveries.
           </p>
           <Button size="lg" variant="secondary" asChild>
             <Link to="/menu">
