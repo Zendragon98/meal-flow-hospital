@@ -1,7 +1,8 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Plus, Minus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { MealItem, useOrder } from '@/contexts/OrderContext';
 
 interface MealCardProps {
@@ -11,14 +12,44 @@ interface MealCardProps {
 const MealCard: React.FC<MealCardProps> = ({ meal }) => {
   const { cartItems, updateCartItem } = useOrder();
   const quantity = cartItems[meal.id] || 0;
+  const [inputValue, setInputValue] = useState(quantity.toString());
+
+  // Update input value when quantity changes (from date change or other components)
+  useEffect(() => {
+    setInputValue(quantity.toString());
+  }, [quantity]);
 
   const handleIncrement = () => {
-    updateCartItem(meal.id, quantity + 1);
+    const newQuantity = quantity + 1;
+    updateCartItem(meal.id, newQuantity);
+    setInputValue(newQuantity.toString());
   };
 
   const handleDecrement = () => {
     if (quantity > 0) {
-      updateCartItem(meal.id, quantity - 1);
+      const newQuantity = quantity - 1;
+      updateCartItem(meal.id, newQuantity);
+      setInputValue(newQuantity.toString());
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setInputValue(value);
+    
+    // Only update context if the value is a valid number
+    const numValue = parseInt(value, 10);
+    if (!isNaN(numValue) && numValue >= 0) {
+      updateCartItem(meal.id, numValue);
+    }
+  };
+
+  const handleBlur = () => {
+    // Ensure the input value is a valid number when the field loses focus
+    const numValue = parseInt(inputValue, 10);
+    if (isNaN(numValue) || numValue < 0) {
+      setInputValue('0');
+      updateCartItem(meal.id, 0);
     }
   };
 
@@ -52,7 +83,14 @@ const MealCard: React.FC<MealCardProps> = ({ meal }) => {
               <Minus size={16} className={quantity === 0 ? "text-gray-400" : "text-gray-700"} />
             </Button>
             
-            <span className="w-8 text-center font-medium">{quantity}</span>
+            <Input
+              type="text" 
+              value={inputValue}
+              onChange={handleInputChange}
+              onBlur={handleBlur}
+              className="w-12 h-8 text-center p-0 text-sm font-medium"
+              aria-label={`Quantity for ${meal.name}`}
+            />
             
             <Button 
               variant="outline" 

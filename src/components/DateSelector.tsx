@@ -18,14 +18,11 @@ const DateSelector = () => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(
     date ? new Date(date) : undefined
   );
-  const [dailyOrders, setDailyOrders] = useState<{[key: string]: {name: string, quantity: number}[]}>({});
+  const [currentOrders, setCurrentOrders] = useState<{name: string, quantity: number}[]>([]);
 
-  // Calculate orders for each date
+  // Calculate current orders for this date
   useEffect(() => {
-    const ordersByDate: {[key: string]: {name: string, quantity: number}[]} = {};
-    
     if (date && Object.keys(cartItems).length > 0) {
-      const currentDate = format(new Date(date), 'yyyy-MM-dd');
       const orders = Object.entries(cartItems).map(([mealId, quantity]) => {
         const meal = meals.find(m => m.id === mealId);
         return { 
@@ -34,30 +31,41 @@ const DateSelector = () => {
         };
       }).filter(order => order.quantity > 0);
       
-      if (orders.length > 0) {
-        ordersByDate[currentDate] = orders;
-      }
+      setCurrentOrders(orders);
+    } else {
+      setCurrentOrders([]);
     }
-    
-    setDailyOrders(ordersByDate);
   }, [cartItems, date, meals]);
 
-  const handleDateSelect = (date: Date | undefined) => {
-    setSelectedDate(date);
-    if (date) {
-      updateDate(format(date, 'yyyy-MM-dd'));
+  const handleDateSelect = (newDate: Date | undefined) => {
+    if (newDate) {
+      const formattedDate = format(newDate, 'yyyy-MM-dd');
+      setSelectedDate(newDate);
+      updateDate(formattedDate);
     }
   };
 
-  // Format current orders for display
-  const getCurrentOrders = () => {
-    if (!date) return [];
-    
-    const currentDate = format(new Date(date), 'yyyy-MM-dd');
-    return dailyOrders[currentDate] || [];
+  const handlePreviousDay = () => {
+    if (selectedDate) {
+      const prevDay = new Date(selectedDate);
+      prevDay.setDate(prevDay.getDate() - 1);
+      
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      if (prevDay >= today) {
+        handleDateSelect(prevDay);
+      }
+    }
   };
 
-  const currentOrders = getCurrentOrders();
+  const handleNextDay = () => {
+    if (selectedDate) {
+      const nextDay = new Date(selectedDate);
+      nextDay.setDate(nextDay.getDate() + 1);
+      handleDateSelect(nextDay);
+    }
+  };
 
   return (
     <div className="bg-white rounded-2xl shadow-elegant p-5 border border-gray-100 flex flex-col h-full transition-all hover:shadow-card">
@@ -95,19 +103,7 @@ const DateSelector = () => {
           variant="outline" 
           size="icon" 
           className="h-7 w-7" 
-          onClick={() => {
-            if (selectedDate) {
-              const prevDay = new Date(selectedDate);
-              prevDay.setDate(prevDay.getDate() - 1);
-              
-              const today = new Date();
-              today.setHours(0, 0, 0, 0);
-              
-              if (prevDay >= today) {
-                handleDateSelect(prevDay);
-              }
-            }
-          }}
+          onClick={handlePreviousDay}
         >
           <ChevronLeft size={14} />
         </Button>
@@ -123,13 +119,7 @@ const DateSelector = () => {
           variant="outline" 
           size="icon" 
           className="h-7 w-7"
-          onClick={() => {
-            if (selectedDate) {
-              const nextDay = new Date(selectedDate);
-              nextDay.setDate(nextDay.getDate() + 1);
-              handleDateSelect(nextDay);
-            }
-          }}
+          onClick={handleNextDay}
         >
           <ChevronRight size={14} />
         </Button>

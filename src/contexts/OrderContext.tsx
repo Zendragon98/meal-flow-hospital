@@ -210,6 +210,9 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const [referralCode, setReferralCode] = useState<string>("");
   const [loyaltyPoints, setLoyaltyPoints] = useState<number>(0);
 
+  // Storage for orders by date
+  const [ordersByDate, setOrdersByDate] = useState<Record<string, Record<string, number>>>({});
+
   // Calculate order totals
   const [subtotal, setSubtotal] = useState<number>(0);
   const [savedAmount, setSavedAmount] = useState<number>(0);
@@ -248,6 +251,16 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     setSubtotal(finalTotal);
   }, [cartItems, referralCode, meals]);
 
+  // Save current cart items when they change
+  useEffect(() => {
+    if (date && Object.keys(cartItems).length > 0) {
+      setOrdersByDate(prev => ({
+        ...prev,
+        [date]: { ...cartItems }
+      }));
+    }
+  }, [cartItems, date]);
+
   // Add/update item in cart
   const updateCartItem = (id: string, quantity: number) => {
     setCartItems(prev => ({
@@ -257,8 +270,20 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   };
 
   // Update date
-  const updateDate = (date: string) => {
-    setDate(date);
+  const updateDate = (newDate: string) => {
+    // Save current cart items before changing date
+    if (date && Object.keys(cartItems).length > 0) {
+      setOrdersByDate(prev => ({
+        ...prev,
+        [date]: { ...cartItems }
+      }));
+    }
+
+    // Set the new date
+    setDate(newDate);
+    
+    // Load cart items for the new date or reset cart if no previous orders exist
+    setCartItems(ordersByDate[newDate] || {});
   };
 
   // Update hospital
@@ -281,6 +306,14 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     // Add loyalty points (1 point per $1 spent)
     const newPoints = Math.floor(subtotal) + loyaltyPoints;
     setLoyaltyPoints(newPoints);
+    
+    // Store the order for this date
+    if (date) {
+      setOrdersByDate(prev => ({
+        ...prev,
+        [date]: { ...cartItems }
+      }));
+    }
     
     // Clear cart after order
     clearCart();
