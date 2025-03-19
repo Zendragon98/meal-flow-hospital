@@ -1,19 +1,36 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { AnimatePresence } from "framer-motion";
 import { OrderProvider } from "@/contexts/OrderContext";
 import Index from "./pages/Index";
 import Menu from "./pages/Menu";
-import SaveMore from "./pages/SaveMore";
-import OrderScheduled from "./pages/OrderScheduled";
-import Account from "./pages/Account";
-import Cart from "./pages/Cart";
+import MealDetail from "./pages/MealDetail";
+import Checkout from "./pages/Checkout";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
+
+// AnimatedRoutes component for page transitions
+const AnimatedRoutes = () => {
+  const location = useLocation();
+
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<Index />} />
+        <Route path="/menu" element={<Menu />} />
+        <Route path="/meal/:id" element={<MealDetail />} />
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </AnimatePresence>
+  );
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -22,15 +39,7 @@ const App = () => (
       <Sonner />
       <OrderProvider>
         <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/menu" element={<Menu />} />
-            <Route path="/save-more" element={<SaveMore />} />
-            <Route path="/order-scheduled" element={<OrderScheduled />} />
-            <Route path="/account" element={<Account />} />
-            <Route path="/cart" element={<Cart />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <AnimatedRoutes />
         </BrowserRouter>
       </OrderProvider>
     </TooltipProvider>

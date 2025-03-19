@@ -1,66 +1,103 @@
-
-import React, { useState } from 'react';
-import Header from '@/components/Header';
-import MealCard from '@/components/MealCard';
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { Search } from 'lucide-react';
+import PageLayout from '@/components/layout/PageLayout';
+import MealCard from '@/components/menu/MealCard';
+import CategoryFilter from '@/components/menu/CategoryFilter';
+import { Input } from '@/components/ui/input';
 import { useOrder } from '@/contexts/OrderContext';
-import { Button } from '@/components/ui/button';
 
 const Menu = () => {
   const { meals } = useOrder();
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  
-  // Extract unique categories
-  const categories = Array.from(new Set(meals.map(meal => meal.category || 'Other')));
-  
-  // Filter meals by selected category
-  const filteredMeals = selectedCategory 
-    ? meals.filter(meal => meal.category === selectedCategory)
-    : meals;
+  const [filteredMeals, setFilteredMeals] = useState(meals);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [activeCategory, setActiveCategory] = useState('All');
+
+  // Extract unique categories from meals
+  const categories = ['All', ...Array.from(new Set(meals.map(meal => meal.category)))];
+
+  // Filter meals based on search term and category
+  useEffect(() => {
+    let filtered = meals;
+
+    if (searchTerm) {
+      filtered = filtered.filter(meal =>
+        meal.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        meal.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (meal.dietary && meal.dietary.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase())))
+      );
+    }
+
+    if (activeCategory !== 'All') {
+      filtered = filtered.filter(meal => meal.category === activeCategory);
+    }
+
+    setFilteredMeals(filtered);
+  }, [searchTerm, activeCategory, meals]);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <Header />
-      
-      <main className="flex-1 container mx-auto px-4 py-8 md:py-12">
-        <section className="animate-fade-in">
-          <h1 className="text-3xl font-bold tracking-tight mb-6">Our Menu</h1>
-          <p className="text-gray-600 max-w-3xl mb-8">
-            Explore our selection of authentic Singaporean cuisine, specially designed for hospital deliveries. 
-            Each meal is prepared with fresh ingredients and balanced nutrition in mind.
-          </p>
-          
-          <div className="flex flex-wrap gap-2 mb-8">
-            <Button 
-              variant={selectedCategory === null ? "default" : "outline"} 
-              onClick={() => setSelectedCategory(null)}
-            >
-              All
-            </Button>
-            {categories.map(category => (
-              <Button 
-                key={category} 
-                variant={selectedCategory === category ? "default" : "outline"}
-                onClick={() => setSelectedCategory(category)}
-              >
-                {category}
-              </Button>
-            ))}
+    <PageLayout>
+      <div className="mb-12">
+        <h1 className="text-3xl font-bold mb-4">Our Menu</h1>
+        <p className="text-muted-foreground max-w-3xl">
+          Specially crafted meals designed with night shift healthcare professionals in mind.
+          All meals are nutritious, easy to digest during odd hours, and deliver sustained energy.
+        </p>
+      </div>
+
+      {/* Search and Filter */}
+      <div className="mb-8">
+        <div className="flex flex-wrap gap-4 items-center justify-between">
+          <div className="relative w-full md:w-80">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <Input
+              type="text"
+              placeholder="Search meals, ingredients, or dietary..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-9 bg-gray-50 dark:bg-gray-800/30 border-gray-200 dark:border-gray-700"
+            />
           </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredMeals.map((meal) => (
-              <MealCard key={meal.id} meal={meal} />
-            ))}
-          </div>
-        </section>
-      </main>
-      
-      <footer className="py-8 mt-auto border-t bg-white">
-        <div className="container mx-auto px-4 text-center text-gray-500 text-sm">
-          &copy; {new Date().getFullYear()} KCK Food. All rights reserved.
         </div>
-      </footer>
-    </div>
+      </div>
+
+      {/* Category Filter */}
+      <CategoryFilter
+        categories={categories}
+        activeCategory={activeCategory}
+        onCategoryChange={setActiveCategory}
+      />
+
+      {/* Results */}
+      {filteredMeals.length === 0 ? (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3 }}
+          className="text-center py-16 bg-gray-50 dark:bg-gray-800/30 rounded-lg"
+        >
+          <p className="text-xl font-medium mb-2">No meals found</p>
+          <p className="text-muted-foreground mb-4">
+            Try adjusting your search or filter criteria
+          </p>
+          <button
+            onClick={() => {
+              setSearchTerm('');
+              setActiveCategory('All');
+            }}
+            className="text-brand-500 hover:text-brand-600 font-medium"
+          >
+            Reset filters
+          </button>
+        </motion.div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredMeals.map((meal, index) => (
+            <MealCard key={meal.id} meal={meal} index={index} />
+          ))}
+        </div>
+      )}
+    </PageLayout>
   );
 };
 

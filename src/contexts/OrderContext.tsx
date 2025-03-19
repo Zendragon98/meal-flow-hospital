@@ -1,14 +1,17 @@
-
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
-// Define meal item type
+// Define meal item type, adapting from both projects
 export interface MealItem {
-  id: string;
+  id: string | number;
   name: string;
   price: number;
   image: string;
   description: string;
-  category?: string;
+  category: string;
+  calories?: number;
+  prepTime?: string;
+  dietary?: string[];
+  isNew?: boolean;
 }
 
 // Define order context type
@@ -39,7 +42,7 @@ const OrderContext = createContext<OrderContextType | undefined>(undefined);
 
 // Provider component
 export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  // Initial meals data with expanded menu
+  // Initial meals data from meal-flow-hospital
   const [meals] = useState<MealItem[]>([
     {
       id: "meal1",
@@ -47,7 +50,10 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       price: 6.50,
       image: "/meals/hainanese-chicken-rice.jpg",
       description: "Fragrant rice with tender poached chicken and flavorful sauces.",
-      category: "Signature Dishes"
+      category: "Signature Dishes",
+      calories: 520,
+      prepTime: "20 min",
+      dietary: ["High-Protein", "Comfort Food"]
     },
     {
       id: "meal2",
@@ -55,7 +61,10 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       price: 10.00,
       image: "/meals/chili-crab.jpg",
       description: "Singapore's iconic dish of crab in sweet and spicy tomato sauce.",
-      category: "Seafood"
+      category: "Seafood",
+      calories: 650,
+      prepTime: "30 min",
+      dietary: ["Seafood", "Protein-Rich"]
     },
     {
       id: "meal3",
@@ -63,7 +72,10 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       price: 7.50,
       image: "/meals/laksa.jpg",
       description: "Spicy coconut milk-based noodle soup with prawns and fish cake.",
-      category: "Noodles"
+      category: "Noodles",
+      calories: 580,
+      prepTime: "15 min",
+      dietary: ["Spicy", "Warming"]
     },
     {
       id: "meal4",
@@ -71,7 +83,10 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       price: 6.50,
       image: "/meals/char-kway-teow.jpg",
       description: "Stir-fried flat rice noodles with prawns, lap cheong, and bean sprouts.",
-      category: "Noodles"
+      category: "Noodles",
+      calories: 550,
+      prepTime: "15 min",
+      dietary: ["Comfort Food"]
     },
     {
       id: "meal5",
@@ -79,7 +94,10 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       price: 7.00,
       image: "/meals/hokkien-mee.jpg",
       description: "Braised egg noodles and rice noodles in a rich prawn and pork stock.",
-      category: "Noodles"
+      category: "Noodles",
+      calories: 530,
+      prepTime: "20 min",
+      dietary: ["Seafood", "Protein-Rich"]
     },
     {
       id: "meal6",
@@ -87,7 +105,10 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       price: 7.50,
       image: "/meals/satay.jpg",
       description: "Grilled skewers of marinated meat served with peanut sauce.",
-      category: "Appetizers"
+      category: "Appetizers",
+      calories: 480,
+      prepTime: "15 min",
+      dietary: ["High-Protein", "Grilled"]
     },
     {
       id: "meal7",
@@ -95,7 +116,10 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       price: 6.50,
       image: "/meals/bak-chor-mee.jpg",
       description: "Minced pork noodles with liver, meatballs, and vinegar.",
-      category: "Noodles"
+      category: "Noodles",
+      calories: 520,
+      prepTime: "15 min",
+      dietary: ["Protein-Rich"]
     },
     {
       id: "meal8",
@@ -103,7 +127,10 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       price: 9.50,
       image: "/meals/fish-head-curry.jpg",
       description: "Red snapper head in a spicy tamarind and coconut curry.",
-      category: "Seafood"
+      category: "Seafood",
+      calories: 620,
+      prepTime: "30 min",
+      dietary: ["Seafood", "Spicy", "Protein-Rich"]
     },
     {
       id: "meal9",
@@ -111,7 +138,10 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       price: 7.00,
       image: "/meals/nasi-lemak.jpg",
       description: "Coconut rice with sambal, fried fish, eggs, peanuts, and cucumber.",
-      category: "Rice Dishes"
+      category: "Rice Dishes",
+      calories: 650,
+      prepTime: "20 min",
+      dietary: ["Comfort Food"]
     },
     {
       id: "meal10",
@@ -119,88 +149,68 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       price: 6.50,
       image: "/meals/roti-prata.jpg",
       description: "Flaky flatbread served with curry dipping sauce.",
-      category: "Appetizers"
+      category: "Appetizers",
+      calories: 450,
+      prepTime: "10 min",
+      dietary: ["Vegetarian"]
     },
+    // Added meals from midnight-mealmate with Singapore's local dish style
     {
       id: "meal11",
-      name: "Bak Kut Teh",
-      price: 8.00,
-      image: "/meals/bak-kut-teh.jpg",
-      description: "Pork ribs soup with herbs and spices, served with rice.",
-      category: "Soup & Stew"
+      name: "Mediterranean Bowl",
+      price: 12.99,
+      image: "/meals/mediterranean-bowl.jpg",
+      description: "Quinoa, grilled chicken, hummus, cucumber, olives, and feta cheese with lemon herb dressing.",
+      category: "Bowls",
+      calories: 520,
+      prepTime: "25 min",
+      dietary: ["Protein-Rich", "Low-Carb"]
     },
     {
       id: "meal12",
-      name: "Yong Tau Foo",
-      price: 7.50,
-      image: "/meals/yong-tau-foo.jpg",
-      description: "Stuffed tofu and vegetables in clear soup or with laksa gravy.",
-      category: "Soup & Stew"
+      name: "Energy Boost Noodles",
+      price: 11.49,
+      image: "/meals/energy-boost-noodles.jpg",
+      description: "Stir-fried rice noodles with tofu, broccoli, carrots and a light soy-ginger sauce.",
+      category: "Noodles",
+      calories: 480,
+      prepTime: "20 min",
+      dietary: ["Vegan", "Dairy-Free"],
+      isNew: true
     },
     {
       id: "meal13",
-      name: "Wanton Mee",
-      price: 6.50,
-      image: "/meals/wanton-mee.jpg",
-      description: "Noodles with char siu and dumplings, in soup or with sauce.",
-      category: "Noodles"
+      name: "Lean Protein Plate",
+      price: 14.99,
+      image: "/meals/lean-protein-plate.jpg",
+      description: "Grilled salmon, steamed asparagus and wild rice with a lemon butter sauce.",
+      category: "Protein Plates",
+      calories: 550,
+      prepTime: "25 min",
+      dietary: ["High-Protein", "Omega-3"]
     },
     {
       id: "meal14",
-      name: "Beef Rendang",
-      price: 8.50,
-      image: "/meals/beef-rendang.jpg",
-      description: "Slow-cooked beef in rich coconut and spice gravy.",
-      category: "Meat Dishes"
+      name: "Overnight Oats",
+      price: 8.99,
+      image: "/meals/overnight-oats.jpg",
+      description: "Steel-cut oats soaked with almond milk, topped with berries, nuts, and a drizzle of honey.",
+      category: "Breakfast",
+      calories: 420,
+      prepTime: "5 min",
+      dietary: ["Fiber-Rich", "Slow-Release Energy"]
     },
     {
       id: "meal15",
-      name: "Oyster Omelette",
-      price: 7.00,
-      image: "/meals/oyster-omelette.jpg",
-      description: "Crispy egg omelette with fresh oysters and tangy chili sauce.",
-      category: "Seafood"
-    },
-    {
-      id: "meal16",
-      name: "Claypot Rice",
-      price: 7.50,
-      image: "/meals/claypot-rice.jpg",
-      description: "Rice cooked in claypot with chinese sausage, chicken, and vegetables.",
-      category: "Rice Dishes"
-    },
-    {
-      id: "meal17",
-      name: "Sambal Stingray",
-      price: 9.00,
-      image: "/meals/sambal-stingray.jpg",
-      description: "Grilled stingray topped with spicy sambal and lime.",
-      category: "Seafood"
-    },
-    {
-      id: "meal18",
-      name: "Fried Carrot Cake",
-      price: 6.50,
-      image: "/meals/fried-carrot-cake.jpg",
-      description: "Stir-fried radish cake with eggs and preserved radish.",
-      category: "Appetizers"
-    },
-    {
-      id: "meal19",
-      name: "Mee Siam",
-      price: 6.50,
-      image: "/meals/mee-siam.jpg",
-      description: "Thin rice vermicelli in spicy, sweet and sour gravy.",
-      category: "Noodles"
-    },
-    {
-      id: "meal20",
-      name: "Curry Chicken Bee Hoon",
-      price: 7.50,
-      image: "/meals/curry-chicken-bee-hoon.jpg",
-      description: "Rice vermicelli in a rich coconut chicken curry.",
-      category: "Noodles"
-    },
+      name: "Hearty Lentil Soup",
+      price: 9.99,
+      image: "/meals/hearty-lentil-soup.jpg",
+      description: "Red lentils with carrots, celery, and spices in a warming vegetable broth.",
+      category: "Soups",
+      calories: 360,
+      prepTime: "15 min",
+      dietary: ["Vegan", "High-Fiber"]
+    }
   ]);
 
   // State for order details
@@ -224,7 +234,7 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     let total = 0;
 
     Object.entries(cartItems).forEach(([id, quantity]) => {
-      const meal = meals.find(m => m.id === id);
+      const meal = meals.find(m => m.id.toString() === id);
       if (meal && quantity > 0) {
         total += meal.price * quantity;
         totalQuantity += quantity;
