@@ -12,9 +12,9 @@ const Header = () => {
   
   return (
     <header className="sticky top-0 z-50 w-full bg-white border-b shadow-sm">
-      <div className="container flex items-center justify-between h-16 px-4 mx-auto">
-        <Link to="/" className="flex items-center gap-2">
-          <img src="/KCKFoodLogo.svg" alt="KCK Food Logo" className="h-14" />
+      <div className="container flex items-center justify-between px-4 mx-auto py-2">
+        <Link to="/" className="flex items-center">
+          <img src="/KCKFoodLogo.svg" alt="KCK Food Logo" className="h-12 w-auto" />
         </Link>
         
         <nav className="hidden md:flex items-center space-x-6">

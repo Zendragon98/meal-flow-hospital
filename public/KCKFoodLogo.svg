@@ -1,25 +1,26 @@
 <!-- KCK FOOD Logo -->
-<svg xmlns="http://www.w3.org/2000/svg" width="500" height="300" viewBox="0 0 500 300">
-  <!-- "Always the Best!" text -->
-  <text x="330" y="110" font-family="cursive, Arial, sans-serif" font-size="36" font-style="italic" fill="#b12025" font-weight="bold">Always the Best!</text>
-  
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="80" viewBox="0 0 400 80" preserveAspectRatio="xMidYMid meet">
+  <!-- Combined logo in a more compact format for header display -->
   <!-- Food dish with steam -->
-  <path d="M125,155 C125,155 135,145 145,155" stroke="#222" stroke-width="2" fill="none"/>
-  <path d="M140,155 C140,155 150,145 160,155" stroke="#222" stroke-width="2" fill="none"/>
-  <ellipse cx="150" cy="170" rx="30" ry="10" fill="#222"/>
+  <path d="M20,30 C20,30 25,25 30,30" stroke="#222" stroke-width="1.5" fill="none"/>
+  <path d="M28,30 C28,30 33,25 38,30" stroke="#222" stroke-width="1.5" fill="none"/>
+  <ellipse cx="30" cy="35" rx="15" ry="5" fill="#222"/>
   
   <!-- K letter -->
-  <path d="M65,210 L65,290 L85,290 L85,255 L120,290 L145,290 L100,250 L145,210 L120,210 L85,245 L85,210 Z" fill="#b12025"/>
+  <path d="M50,15 L50,65 L60,65 L60,45 L80,65 L95,65 L70,40 L95,15 L80,15 L60,35 L60,15 Z" fill="#b12025"/>
   
   <!-- C letter -->
-  <path d="M165,210 Q145,250 165,290 L215,290 L215,270 L185,270 Q175,250 185,230 L215,230 L215,210 Z" fill="#28a745"/>
+  <path d="M105,15 Q95,40 105,65 L135,65 L135,55 L115,55 Q110,40 115,25 L135,25 L135,15 Z" fill="#28a745"/>
   
   <!-- K letter -->
-  <path d="M225,210 L225,290 L245,290 L245,255 L280,290 L305,290 L260,250 L305,210 L280,210 L245,245 L245,210 Z" fill="#28a745"/>
+  <path d="M145,15 L145,65 L155,65 L155,45 L175,65 L190,65 L165,40 L190,15 L175,15 L155,35 L155,15 Z" fill="#28a745"/>
   
   <!-- FOOD text -->
-  <text x="325" y="270" font-family="Arial, sans-serif" font-size="60" font-weight="bold" fill="#28a745">FOOD</text>
+  <text x="200" y="55" font-family="Arial, sans-serif" font-size="30" font-weight="bold" fill="#28a745">FOOD</text>
+  
+  <!-- "Always the Best!" text -->
+  <text x="200" y="25" font-family="cursive, Arial, sans-serif" font-size="16" font-style="italic" fill="#b12025" font-weight="bold">Always the Best!</text>
   
   <!-- Tagline -->
-  <text x="325" y="305" font-family="Arial, sans-serif" font-size="18" fill="#333">HEALTHY AND TASTY</text>
+  <text x="200" y="72" font-family="Arial, sans-serif" font-size="10" fill="#333">HEALTHY AND TASTY</text>
 </svg>
