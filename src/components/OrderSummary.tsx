@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Award, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,7 +16,11 @@ import { toast } from '@/components/ui/use-toast';
 import { useOrder } from '@/contexts/OrderContext';
 import { VALID_REFERRAL_CODE } from '@/lib/constants';
 
-const OrderSummary = () => {
+interface OrderSummaryProps {
+  hideOrderButton?: boolean;
+}
+
+const OrderSummary: React.FC<OrderSummaryProps> = ({ hideOrderButton = false }) => {
   const { 
     cartItems, 
     referralCode, 
@@ -30,6 +33,11 @@ const OrderSummary = () => {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [localReferralCode, setLocalReferralCode] = useState(referralCode);
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Auto-hide order button on cart page
+  const isCartPage = location.pathname === '/cart';
+  const shouldHideButton = hideOrderButton || isCartPage;
 
   // Check if cart is empty
   const isCartEmpty = Object.values(cartItems).every(qty => qty === 0);
@@ -181,15 +189,17 @@ const OrderSummary = () => {
         </p>
       </div>
       
-      {/* Order Button */}
-      <Button 
-        className="w-full mt-6" 
-        size="lg"
-        onClick={handleOrderNow}
-        disabled={isCartEmpty}
-      >
-        Place Order
-      </Button>
+      {/* Order Button - only show if not hidden */}
+      {!shouldHideButton && (
+        <Button 
+          className="w-full mt-6" 
+          size="lg"
+          onClick={handleOrderNow}
+          disabled={isCartEmpty}
+        >
+          Place Order
+        </Button>
+      )}
       
       {/* Order Confirmation Dialog */}
       <Dialog open={showConfirmation} onOpenChange={setShowConfirmation}>

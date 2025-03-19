@@ -34,8 +34,14 @@ const Index = () => {
   return (
     <PageLayout fullWidth>
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-brand-500/10 via-background to-background py-20 sm:py-32">
-        <div className="absolute inset-0 bg-grid-pattern opacity-5" />
+      <section className="relative overflow-hidden py-20 sm:py-32">
+        {/* Background image */}
+        <div className="absolute inset-0 bg-cover bg-center" style={{ 
+          backgroundImage: 'url(/healthcare-professionals.jpg)', 
+          filter: 'brightness(0.4)',
+          zIndex: -1
+        }} />
+        
         <div className="container relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <motion.div
@@ -50,10 +56,10 @@ const Index = () => {
               <div className="mb-4">
                 <img src="/KCKLogo.svg" alt="KCK Logo" className="h-16 w-auto" />
               </div>
-              <h1 className="text-4xl sm:text-5xl font-bold leading-tight">
+              <h1 className="text-4xl sm:text-5xl font-bold leading-tight text-white">
                 Delicious Meals Delivered to Your Hospital
               </h1>
-              <p className="text-xl text-muted-foreground max-w-lg">
+              <p className="text-xl text-white/80 max-w-lg">
                 Specially crafted meals for night shift healthcare workers, delivered right to your hospital when you need them most.
               </p>
               <div className="flex flex-wrap gap-4">
@@ -63,7 +69,7 @@ const Index = () => {
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
-                <Button size="lg" variant="outline" asChild>
+                <Button size="lg" variant="outline" className="bg-white/10 text-white hover:bg-white/20 hover:text-white" asChild>
                   <Link to="/checkout">
                     Schedule Delivery
                   </Link>
@@ -75,7 +81,7 @@ const Index = () => {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="relative"
+              className="relative hidden lg:block"
             >
               <div className="aspect-square rounded-2xl overflow-hidden shadow-xl">
                 <img 
@@ -87,9 +93,6 @@ const Index = () => {
               
               <div className="absolute -bottom-6 -left-6 bg-white dark:bg-gray-900 p-4 rounded-lg shadow-lg">
                 <div className="flex items-center gap-2">
-                  <div className="h-12 w-12 rounded-full bg-brand-500/10 flex items-center justify-center">
-                    <CheckCircle2 className="h-6 w-6 text-brand-500" />
-                  </div>
                   <div>
                     <p className="font-medium">Trusted by</p>
                     <p className="text-brand-500 font-bold">500+ Healthcare Workers</p>
