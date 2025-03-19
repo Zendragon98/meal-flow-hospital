@@ -50,11 +50,8 @@ const Index = () => {
               transition={{ duration: 0.6 }}
               className="space-y-6"
             >
-              <div className="inline-block bg-brand-100 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 px-4 py-1 rounded-full text-sm font-medium mb-2">
+              <div className="inline-block bg-white/20 px-4 py-1 rounded-full text-sm font-medium mb-2 text-white">
                 For Healthcare Professionals
-              </div>
-              <div className="mb-4">
-                <img src="/KCKLogo.svg" alt="KCK Logo" className="h-16 w-auto" />
               </div>
               <h1 className="text-4xl sm:text-5xl font-bold leading-tight text-white">
                 Delicious Meals Delivered to Your Hospital
