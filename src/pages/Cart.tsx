@@ -1,22 +1,33 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Minus, Trash2 } from 'lucide-react';
+import { Plus, Minus, Trash2, Calendar, Edit2 } from 'lucide-react';
 import PageLayout from '@/components/layout/PageLayout';
 import OrderSummary from '@/components/OrderSummary';
 import { Button } from '@/components/ui/button';
 import { useOrder } from '@/contexts/OrderContext';
 import { formatDateForDisplay } from '@/lib/constants';
+import DateSelector from '@/components/DateSelector';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 const Cart = () => {
-  const { meals, cartItems, updateCartItem, date, hospital } = useOrder();
+  const { meals, cartItems, updateCartItem, date, updateDate, hospital } = useOrder();
   const navigate = useNavigate();
+  const [isDateSelectorOpen, setIsDateSelectorOpen] = useState(false);
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   
   // Get cart items with quantities > 0
   const cartItemsWithDetails = meals
     .filter(meal => (cartItems[meal.id.toString()] || 0) > 0)
     .map(meal => ({
       ...meal,
-      quantity: cartItems[meal.id.toString()]
+      quantity: cartItems[meal.id.toString()],
+      stringId: meal.id.toString()
     }));
   
   const isCartEmpty = cartItemsWithDetails.length === 0;
@@ -39,8 +50,26 @@ const Cart = () => {
     updateCartItem(id.toString(), 0);
   };
   
+  const handleChangeDateClick = (id: string) => {
+    setSelectedItemId(id);
+    setIsDateSelectorOpen(true);
+  };
+  
+  const handleDateSelected = (newDate: string) => {
+    if (selectedItemId) {
+      // Logic to change the date for this specific item would go here
+      // For now, we'll just update the global date
+      updateDate(newDate);
+      setIsDateSelectorOpen(false);
+    }
+  };
+  
   const continueShopping = () => {
-    navigate('/');
+    navigate('/menu');
+  };
+  
+  const proceedToCheckout = () => {
+    navigate('/checkout');
   };
 
   return (
@@ -55,7 +84,7 @@ const Cart = () => {
               <p className="text-gray-600 mb-6">
                 Looks like you haven't added any meals to your cart yet.
               </p>
-              <Button onClick={continueShopping}>Continue Shopping</Button>
+              <Button onClick={continueShopping}>Browse Menu</Button>
             </div>
           </div>
         ) : (
@@ -63,7 +92,23 @@ const Cart = () => {
             <div className="lg:col-span-2">
               {/* Delivery Details */}
               <div className="bg-white rounded-2xl shadow-elegant p-6 border border-gray-100 mb-6">
-                <h2 className="text-lg font-semibold mb-4">Delivery Details</h2>
+                <div className="flex justify-between items-center">
+                  <h2 className="text-lg font-semibold mb-4">Delivery Details</h2>
+                  <Dialog open={isDateSelectorOpen} onOpenChange={setIsDateSelectorOpen}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" size="sm" className="flex items-center mb-4">
+                        <Calendar className="mr-2 h-4 w-4" />
+                        <span>Change Date</span>
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Select New Delivery Date</DialogTitle>
+                      </DialogHeader>
+                      <DateSelector onDateSelected={handleDateSelected} initialDate={date} />
+                    </DialogContent>
+                  </Dialog>
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <span className="text-sm text-gray-500">Date</span>
@@ -80,54 +125,70 @@ const Cart = () => {
               <div className="bg-white rounded-2xl shadow-elegant p-6 border border-gray-100">
                 <h2 className="text-lg font-semibold mb-4">Cart Items</h2>
                 
-                <div className="divide-y">
-                  {cartItemsWithDetails.map((item) => (
-                    <div key={item.id.toString()} className="py-4 flex items-center">
-                      <div className="h-20 w-20 rounded-lg overflow-hidden mr-4 flex-shrink-0">
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          className="h-full w-full object-cover"
-                        />
-                      </div>
-                      
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-medium text-base">{item.name}</h3>
-                        <p className="text-gray-600 text-sm">${item.price.toFixed(2)}</p>
-                      </div>
-                      
-                      <div className="flex items-center space-x-2 mr-4">
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          className="h-8 w-8 rounded-full"
-                          onClick={() => handleDecrement(item.id)}
-                        >
-                          <Minus size={16} />
-                        </Button>
-                        
-                        <span className="w-8 text-center font-medium">{item.quantity}</span>
-                        
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          className="h-8 w-8 rounded-full"
-                          onClick={() => handleIncrement(item.id)}
-                        >
-                          <Plus size={16} />
-                        </Button>
-                      </div>
-                      
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-gray-400 hover:text-destructive"
-                        onClick={() => handleRemove(item.id)}
-                      >
-                        <Trash2 size={16} />
-                      </Button>
-                    </div>
-                  ))}
+                <div className="border rounded-lg overflow-hidden mb-6">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="bg-gray-50">
+                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Item</th>
+                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Quantity</th>
+                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Price</th>
+                        <th className="px-4 py-3 text-center text-sm font-medium text-gray-500">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y">
+                      {cartItemsWithDetails.map((item) => (
+                        <tr key={item.stringId} className="bg-white">
+                          <td className="px-4 py-4">
+                            <div className="flex items-center">
+                              <div className="h-12 w-12 rounded-md overflow-hidden mr-3">
+                                <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
+                              </div>
+                              <div>
+                                <div className="font-medium">{item.name}</div>
+                                <div className="text-sm text-gray-500">{item.category}</div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-4 py-4">
+                            <div className="flex items-center space-x-2">
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                className="h-7 w-7 rounded-full"
+                                onClick={() => handleDecrement(item.stringId)}
+                              >
+                                <Minus size={14} />
+                              </Button>
+                              
+                              <span className="w-8 text-center font-medium">{item.quantity}</span>
+                              
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                className="h-7 w-7 rounded-full"
+                                onClick={() => handleIncrement(item.stringId)}
+                              >
+                                <Plus size={14} />
+                              </Button>
+                            </div>
+                          </td>
+                          <td className="px-4 py-4">
+                            ${(item.price * item.quantity).toFixed(2)}
+                          </td>
+                          <td className="px-4 py-4 text-center">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-gray-400 hover:text-destructive"
+                              onClick={() => handleRemove(item.stringId)}
+                            >
+                              <Trash2 size={16} />
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
                 
                 <div className="mt-6 pt-4 border-t flex justify-between items-center">
@@ -140,6 +201,11 @@ const Cart = () => {
             
             <div>
               <OrderSummary />
+              <div className="mt-4">
+                <Button className="w-full" onClick={proceedToCheckout}>
+                  Proceed to Checkout
+                </Button>
+              </div>
             </div>
           </div>
         )}

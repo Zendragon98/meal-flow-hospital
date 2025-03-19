@@ -15,6 +15,7 @@ import Account from "./pages/Account";
 import SaveMore from "./pages/SaveMore";
 import OrderScheduled from "./pages/OrderScheduled";
 import Cart from "./pages/Cart";
+import MyOrders from "./pages/MyOrders";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +35,7 @@ const AnimatedRoutes = () => {
         <Route path="/save-more" element={<SaveMore />} />
         <Route path="/order-scheduled" element={<OrderScheduled />} />
         <Route path="/cart" element={<Cart />} />
+        <Route path="/my-orders" element={<MyOrders />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AnimatePresence>

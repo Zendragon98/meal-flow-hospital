@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingCart, User, Calendar } from 'lucide-react';
+import { ShoppingCart, User, Calendar, Package } from 'lucide-react';
 import { useOrder } from '@/contexts/OrderContext';
 import { Badge } from '@/components/ui/badge';
 
@@ -24,6 +24,12 @@ const Header = () => {
           <Link to="/menu" className="text-sm font-medium transition-colors hover:text-primary">
             Menu
           </Link>
+          <Link to="/my-orders" className="text-sm font-medium transition-colors hover:text-primary flex items-center">
+            My Orders
+            {cartItemCount > 0 && (
+              <Badge className="ml-1 bg-primary hover:bg-primary/90">{cartItemCount}</Badge>
+            )}
+          </Link>
           <Link to="/save-more" className="text-sm font-medium transition-colors hover:text-primary">
             Save More
           </Link>
@@ -39,6 +45,15 @@ const Header = () => {
         <div className="flex items-center space-x-4">
           <Link to="/cart" className="relative">
             <ShoppingCart className="w-6 h-6" />
+            {cartItemCount > 0 && (
+              <Badge className="absolute -top-2 -right-2 bg-primary hover:bg-primary/90 w-5 h-5 flex items-center justify-center p-0 text-[10px]">
+                {cartItemCount}
+              </Badge>
+            )}
+          </Link>
+          
+          <Link to="/my-orders" className="relative md:hidden">
+            <Package className="w-6 h-6" />
             {cartItemCount > 0 && (
               <Badge className="absolute -top-2 -right-2 bg-primary hover:bg-primary/90 w-5 h-5 flex items-center justify-center p-0 text-[10px]">
                 {cartItemCount}

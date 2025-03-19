@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Calendar, ChevronLeft, ChevronRight, Clock } from 'lucide-react';
 import { format, isToday, isSameDay } from 'date-fns';
@@ -13,18 +12,25 @@ import { Badge } from '@/components/ui/badge';
 import { useOrder } from '@/contexts/OrderContext';
 import { formatDateForDisplay } from '@/lib/constants';
 
-const DateSelector = () => {
-  const { date, updateDate, cartItems, meals } = useOrder();
+interface DateSelectorProps {
+  onDateSelected?: (date: string) => void;
+  initialDate?: string;
+}
+
+const DateSelector = ({ onDateSelected, initialDate }: DateSelectorProps = {}) => {
+  const { date: contextDate, updateDate, cartItems, meals } = useOrder();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(
-    date ? new Date(date) : undefined
+    initialDate ? new Date(initialDate) : contextDate ? new Date(contextDate) : undefined
   );
   const [currentOrders, setCurrentOrders] = useState<{name: string, quantity: number}[]>([]);
+  
+  const activeDate = initialDate || contextDate;
 
   // Calculate current orders for this date
   useEffect(() => {
-    if (date && Object.keys(cartItems).length > 0) {
+    if (activeDate && Object.keys(cartItems).length > 0) {
       const orders = Object.entries(cartItems).map(([mealId, quantity]) => {
-        const meal = meals.find(m => m.id === mealId);
+        const meal = meals.find(m => m.id.toString() === mealId);
         return { 
           name: meal ? meal.name : 'Unknown Meal',
           quantity 
@@ -35,13 +41,18 @@ const DateSelector = () => {
     } else {
       setCurrentOrders([]);
     }
-  }, [cartItems, date, meals]);
+  }, [cartItems, activeDate, meals]);
 
   const handleDateSelect = (newDate: Date | undefined) => {
     if (newDate) {
       const formattedDate = format(newDate, 'yyyy-MM-dd');
       setSelectedDate(newDate);
-      updateDate(formattedDate);
+      
+      if (onDateSelected) {
+        onDateSelected(formattedDate);
+      } else {
+        updateDate(formattedDate);
+      }
     }
   };
 
@@ -109,7 +120,7 @@ const DateSelector = () => {
         </Button>
         
         <h3 className="font-medium text-base">
-          {date ? formatDateForDisplay(date) : 'Select a date'}
+          {activeDate ? formatDateForDisplay(activeDate) : 'Select a date'}
           {selectedDate && isToday(selectedDate) && (
             <Badge variant="outline" className="ml-2 text-xs bg-blue-50 border-blue-200 text-blue-600">Today</Badge>
           )}
