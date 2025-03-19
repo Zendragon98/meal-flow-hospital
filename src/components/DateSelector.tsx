@@ -18,7 +18,7 @@ interface DateSelectorProps {
 }
 
 const DateSelector = ({ onDateSelected, initialDate }: DateSelectorProps = {}) => {
-  const { date: contextDate, updateDate, cartItems, meals } = useOrder();
+  const { date: contextDate, updateDate, cartItems, itemDates, meals } = useOrder();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(
     initialDate ? new Date(initialDate) : contextDate ? new Date(contextDate) : undefined
   );
@@ -29,19 +29,26 @@ const DateSelector = ({ onDateSelected, initialDate }: DateSelectorProps = {}) =
   // Calculate current orders for this date
   useEffect(() => {
     if (activeDate && Object.keys(cartItems).length > 0) {
-      const orders = Object.entries(cartItems).map(([mealId, quantity]) => {
-        const meal = meals.find(m => m.id.toString() === mealId);
-        return { 
-          name: meal ? meal.name : 'Unknown Meal',
-          quantity 
-        };
-      }).filter(order => order.quantity > 0);
+      // Filter items that are scheduled for this date
+      const ordersForSelectedDate = Object.entries(cartItems)
+        .filter(([mealId, quantity]) => {
+          // Check if this item has a delivery date matching the active date
+          const itemDate = itemDates[mealId] || contextDate;
+          return quantity > 0 && itemDate === activeDate;
+        })
+        .map(([mealId, quantity]) => {
+          const meal = meals.find(m => m.id.toString() === mealId);
+          return { 
+            name: meal ? meal.name : 'Unknown Meal',
+            quantity 
+          };
+        });
       
-      setCurrentOrders(orders);
+      setCurrentOrders(ordersForSelectedDate);
     } else {
       setCurrentOrders([]);
     }
-  }, [cartItems, activeDate, meals]);
+  }, [cartItems, activeDate, meals, itemDates, contextDate]);
 
   const handleDateSelect = (newDate: Date | undefined) => {
     if (newDate) {
